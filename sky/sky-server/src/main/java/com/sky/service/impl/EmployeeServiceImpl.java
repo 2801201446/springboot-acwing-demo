@@ -1,16 +1,20 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -83,6 +88,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.addemployee(employee);
+    }
+
+    //分页查询员工
+    public PageResult queryemployee(EmployeePageQueryDTO employeePageQueryDTO) {
+        //开始分页，采用依赖PageHelper
+        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        //对象类型只能是Page，类型是每条数据实体
+        Page <Employee> page=employeeMapper.queryemployee();
+        Long total=page.getTotal();
+        List record=page.getResult();
+        return new PageResult(total,record);
+    }
+
+    //启用禁用员工状态
+    public void startorstop(Integer status, Long id) {
+        Employee employee=new Employee();
+        employee.setStatus(status);
+        employee.setId(id);
+        employeeMapper.startorstop(employee);
+    }
+
+
+    public Employee updateemployee(Long id) {
+        Employee employee=employeeMapper.updateemployee(id);
+        //不让前端直接看到密码
+        employee.setPassword("****");
+        return employee;
+    }
+    public void updateemployee2(EmployeeDTO employeeDTO) {
+        Employee employee=new Employee();
+        //DTO -> pojo
+        BeanUtils.copyProperties(employeeDTO,employee);
+
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.updateemployee2(employee);
     }
 
 }

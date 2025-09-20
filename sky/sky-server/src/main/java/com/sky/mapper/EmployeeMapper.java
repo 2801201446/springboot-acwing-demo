@@ -1,5 +1,6 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,4 +25,21 @@ public interface EmployeeMapper {
     +"values"+
     "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{createTime},#{updateTime},#{createUser},#{updateUser},#{status})")
     void addemployee(Employee employee);
+
+    /**
+     * 分页查询员工数据
+     * @return
+     */
+    Page<Employee> queryemployee();
+
+    /**
+     * 更改员工状态
+     * @return
+     */
+
+    void startorstop(Employee employee);
+
+    Employee updateemployee(Long id);
+
+    void updateemployee2(Employee employee);
 }
